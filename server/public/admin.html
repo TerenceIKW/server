@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Baobab · Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Yeseva+One&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== BASE ===== */
+    :root {
+      --navy: #1a2f3b;
+      --navy-dark: #0d1f2b;
+      --terracotta: #c76b2b;
+      --terracotta-dark: #a65f2a;
+      --terracotta-light: #ffb57a;
+      --cream: #f7f5f2;
+      --cream-card: #fcf8f5;
+      --line: #e8e0d8;
+      --text: #1e2b32;
+      --muted: #5a6b7a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+    }
+    h1, h2, h3, .brand-font { font-family: 'Yeseva One', Georgia, serif; letter-spacing: 0.5px; }
+    code { background: rgba(199,107,43,0.10); color: var(--terracotta-dark); padding: 2px 7px; border-radius: 6px; font-size: 0.85em; }
+
+    /* ===== LOGIN SCREEN ===== */
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(199,107,43,0.12), transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(26,47,59,0.10), transparent 45%),
+        linear-gradient(145deg, #0d1f2b 0%, #1a2f3b 35%, #2e4b60 70%, #1a2f3b 100%);
+      padding: 2rem;
+    }
+    .login-card {
+      background: white;
+      border-radius: 28px;
+      padding: 3rem 2.5rem;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.35), 0 12px 32px rgba(0,0,0,0.18);
+      position: relative;
+      overflow: hidden;
+    }
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 220px; height: 220px;
+      background: rgba(199,107,43,0.10);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .login-logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--cream-card);
+      border: 2px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.4rem;
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 8px 28px rgba(26,47,59,0.08);
+    }
+    .login-logo img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
+    .login-card h1 {
+      font-size: 1.9rem;
+      color: var(--navy);
+      text-align: center;
+      margin-bottom: 0.4rem;
+      position: relative; z-index: 2;
+    }
+    .login-card .login-sub {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 2rem;
+      position: relative; z-index: 2;
+    }
+    .login-card .form-label-sm {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+      display: block;
+      position: relative; z-index: 2;
+    }
+    .login-card .form-control {
+      height: 52px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--cream-card);
+      font-size: 0.95rem;
+      padding: 0 1.1rem;
+      position: relative; z-index: 2;
+    }
+    .login-card .form-control:focus {
+      border-color: var(--terracotta);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(199,107,43,0.12);
+    }
+    .btn-baobab {
+      background: var(--terracotta);
+      color: white;
+      border: none;
+      height: 52px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(199,107,43,0.35);
+      transition: 0.25s cubic-bezier(0.23,1,0.32,1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: relative; z-index: 2;
+    }
+    .btn-baobab:hover { background: var(--terracotta-dark); color: white; transform: translateY(-2px) scale(1.01); box-shadow: 0 12px 32px rgba(199,107,43,0.50); }
+    .btn-baobab:disabled { opacity: 0.7; cursor: not-allowed; }
+    .login-error {
+      color: #b71c1c;
+      font-size: 0.85rem;
+      margin-top: 0.8rem;
+      text-align: center;
+      min-height: 1.2rem;
+      position: relative; z-index: 2;
+    }
+
+    /* ===== APP SHELL ===== */
+    .app-shell { display: none; min-height: 100vh; }
+    .app-shell.active { display: flex; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 280px;
+      flex-shrink: 0;
+      background: linear-gradient(180deg, var(--navy-dark) 0%, var(--navy) 60%, #2e4b60 100%);
+      color: #d7e2ea;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 1.6rem 1rem;
+      box-shadow: 4px 0 30px rgba(26,47,59,0.15);
+      z-index: 100;
+    }
+    .sidebar .side-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 0.4rem 1.6rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 1.4rem;
+    }
+    .sidebar .side-brand img {
+      width: 76px;
+      height: 76px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.96);
+      padding: 6px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+    .sidebar .side-brand-text .name {
+      font-family: 'Yeseva One', serif;
+      color: white;
+      font-size: 1.35rem;
+      line-height: 1.1;
+      letter-spacing: 0.5px;
+    }
+    .sidebar .side-brand-text .tag {
+      font-size: 0.62rem;
+      letter-spacing: 1.2px;
+      color: var(--terracotta-light);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 4px;
+      display: block;
+    }
+    .side-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .side-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      color: #b0c8d8;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+    .side-nav a i { width: 18px; text-align: center; font-size: 0.85rem; color: #8fa8b8; transition: color 0.2s; }
+    .side-nav a:hover { background: rgba(255,255,255,0.06); color: white; }
+    .side-nav a:hover i { color: var(--terracotta-light); }
+    .side-nav a.active {
+      background: rgba(199,107,43,0.18);
+      color: white;
+      font-weight: 600;
+      box-shadow: inset 0 0 0 1px rgba(199,107,43,0.35);
+    }
+    .side-nav a.active i { color: var(--terracotta-light); }
+    .side-nav .count-pill {
+      margin-left: auto;
+      background: rgba(255,255,255,0.12);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 40px;
+      min-width: 22px;
+      text-align: center;
+    }
+    .side-nav a.active .count-pill { background: var(--terracotta); }
+    .side-bottom {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 1rem;
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .side-bottom a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      color: #8fa8b8;
+      text-decoration: none;
+      font-size: 0.82rem;
+      transition: all 0.2s;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+    .side-bottom a:hover { background: rgba(255,255,255,0.06); color: white; }
+    .side-bottom a.danger:hover { background: rgba(183,28,28,0.18); color: #ff8a80; }
+
+    /* ===== MAIN ===== */
+    .main-area { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+    .topbar {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+    .topbar .page-title {
+      font-family: 'Yeseva One', serif;
+      font-size: 1.4rem;
+      color: var(--navy);
+      margin: 0;
+      line-height: 1.2;
+    }
+    .topbar .page-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin: 0;
+    }
+    .topbar .live-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #2e7d32;
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+    .topbar .btn-icon {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--navy);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .topbar .btn-icon:hover { background: var(--cream-card); border-color: var(--terracotta); color: var(--terracotta); }
+
+    /* ===== STATS ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+      padding: 2rem 2rem 1rem;
+    }
+    @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr; padding: 1.2rem 1rem 0.5rem; } }
+    .stat-card {
+      background: white;
+      border-radius: 22px;
+      padding: 1.5rem 1.4rem;
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 20px rgba(26,47,59,0.04);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(26,47,59,0.10); border-color: rgba(199,107,43,0.25); }
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: rgba(199,107,43,0.06);
+      pointer-events: none;
+    }
+    .stat-card .st-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: rgba(199,107,43,0.12);
+      color: var(--terracotta);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      margin-bottom: 0.9rem;
+    }
+    .stat-card.alt .st-icon { background: rgba(26,47,59,0.10); color: var(--navy); }
+    .stat-card .st-num {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+    }
+    .stat-card .st-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 5px;
+    }
+
+    /* ===== TOOLBAR ===== */
+    .content-area { padding: 1rem 2rem 2.5rem; flex: 1; }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .toolbar .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+      max-width: 380px;
+    }
+    .toolbar .search-box i {
+      position: absolute;
+      left: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .toolbar .search-box input {
+      width: 100%;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 40px;
+      padding: 0 1rem 0 2.6rem;
+      background: white;
+      font-size: 0.88rem;
+      font-family: inherit;
+      transition: 0.25s;
+    }
+    .toolbar .search-box input:focus {
+      outline: none;
+      border-color: var(--terracotta);
+      box-shadow: 0 0 0 4px rgba(199,107,43,0.10);
+    }
+    .toolbar .filter-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-chip {
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filter-chip:hover { border-color: var(--terracotta); color: var(--terracotta); }
+    .filter-chip.active { background: var(--terracotta); border-color: var(--terracotta); color: white; box-shadow: 0 4px 14px rgba(199,107,43,0.30); }
+    .toolbar .btn-export {
+      height: 44px;
+      padding: 0 1.4rem;
+      border-radius: 40px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--navy);
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .toolbar .btn-export:hover { border-color: var(--navy); background: var(--navy); color: white; }
+
+    /* ===== TABLE ===== */
+    .table-card {
+      background: white;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 20px rgba(26,47,59,0.04);
+      overflow: hidden;
+    }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 0; }
+    thead th {
+      background: var(--cream-card);
+      color: var(--navy);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      padding: 1rem 1.1rem;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    tbody td {
+      padding: 0.95rem 1.1rem;
+      border-bottom: 1px solid #f2ece5;
+      color: var(--text);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr { transition: background 0.15s; cursor: pointer; }
+    tbody tr:hover { background: var(--cream-card); }
+    .cell-name { font-weight: 600; color: var(--navy); }
+    .cell-email { color: var(--muted); font-size: 0.82rem; }
+    .cell-amount { font-weight: 700; color: var(--terracotta); white-space: nowrap; }
+    .cell-date { color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
+    .cell-msg { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.32rem 0.75rem;
+      border-radius: 40px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .badge-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .badge-pending { background: #fff3e0; color: #b2651a; }
+    .badge-paid { background: #e8f5e9; color: #2e7d32; }
+    .badge-cancelled, .badge-failed { background: #ffebee; color: #b71c1c; }
+
+    .btn-row-action {
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-row-action:hover { border-color: var(--terracotta); color: var(--terracotta); background: var(--cream-card); }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+    }
+    .empty-state i { font-size: 2.5rem; color: var(--line); margin-bottom: 1rem; display: block; }
+    .empty-state h4 { font-family: 'Yeseva One', serif; color: var(--navy); font-size: 1.2rem; margin-bottom: 0.4rem; }
+    .empty-state p { font-size: 0.88rem; margin: 0; }
+
+    /* ===== PAGINATION ===== */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.2rem;
+      border-top: 1px solid var(--line);
+      background: var(--cream-card);
+      font-size: 0.82rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+    .pagination-bar .pager { display: flex; gap: 6px; }
+    .pagination-bar .pager button {
+      min-width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--navy);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .pagination-bar .pager button:hover:not(:disabled) { border-color: var(--terracotta); color: var(--terracotta); }
+    .pagination-bar .pager button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .pagination-bar .pager button.active { background: var(--terracotta); border-color: var(--terracotta); color: white; }
+
+    /* ===== MODAL ===== */
+    .modal-content {
+      border: none;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.30);
+    }
+    .modal-header {
+      background: linear-gradient(145deg, var(--navy-dark) 0%, var(--navy) 100%);
+      color: white;
+      border: none;
+      padding: 1.6rem 1.8rem;
+    }
+    .modal-header h5 { font-family: 'Yeseva One', serif; font-size: 1.3rem; margin: 0; }
+    .modal-header .btn-close { filter: invert(1); opacity: 0.7; }
+    .modal-body { padding: 1.8rem; }
+    .detail-row {
+      display: flex;
+      gap: 1rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #f2ece5;
+      font-size: 0.9rem;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row .dt {
+      flex: 0 0 130px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.8px;
+      padding-top: 3px;
+    }
+    .detail-row .dd { flex: 1; color: var(--navy); word-break: break-word; }
+
+    /* ===== TOAST ===== */
+    .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 2000; display: flex; flex-direction: column; gap: 0.6rem; }
+    .baobab-toast {
+      background: var(--navy);
+      color: white;
+      padding: 1rem 1.4rem;
+      border-radius: 14px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 260px;
+      animation: toastIn 0.3s cubic-bezier(0.23,1,0.32,1);
+      border-left: 4px solid var(--terracotta);
+    }
+    .baobab-toast.success { border-left-color: #2e7d32; }
+    .baobab-toast.error { border-left-color: #b71c1c; }
+    .baobab-toast i { font-size: 1rem; }
+    @keyframes toastIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .sidebar { position: fixed; left: -300px; transition: left 0.3s ease; width: 280px; }
+      .sidebar.open { left: 0; }
+      .topbar { padding: 0.9rem 1.2rem; }
+      .content-area { padding: 1rem 1.2rem 2rem; }
+      .topbar .page-title { font-size: 1.15rem; }
+      .mobile-toggle { display: inline-flex !important; }
+    }
+    .mobile-toggle { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================ -->
+  <!-- LOGIN SCREEN                                                  -->
+  <!-- ============================================================ -->
+  <div class="login-wrap" id="loginScreen">
+    <div class="login-card">
+      <div class="login-logo">
+        <img src="/assets/img/logo%2c.png" alt="Baobab Networking Centre" />
+      </div>
+      <h1>Admin Dashboard</h1>
+      <p class="login-sub">Baobab Networking Centre · Staff access</p>
+
+      <label class="form-label-sm" for="adminKey">Admin Key</label>
+      <input type="password" id="adminKey" class="form-control mb-3" placeholder="Enter your admin key" autocomplete="off" />
+      <button class="btn-baobab" id="loginBtn" onclick="login()">
+        <i class="fas fa-lock"></i> Sign In
+      </button>
+      <div class="login-error" id="loginError"></div>
+      <p class="text-muted small mt-3 mb-0" style="text-align:center; position:relative; z-index:2;">
+        This is the <code>ADMIN_KEY</code> from your <code>.env</code> file.
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- APP SHELL                                                     -->
+  <!-- ============================================================ -->
+  <div class="app-shell" id="appShell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="side-brand">
+        <img src="/assets/img/logo%2c.png" alt="Baobab logo" />
+        <div class="side-brand-text">
+          <div class="name">Baobab</div>
+          <span class="tag">Admin Console</span>
+        </div>
+      </div>
+
+      <nav class="side-nav">
+        <a data-tab="donations" class="active" onclick="switchTab('donations')">
+          <i class="fas fa-hand-holding-usd"></i> Donations
+          <span class="count-pill" id="pillDonations">0</span>
+        </a>
+        <a data-tab="contacts" onclick="switchTab('contacts')">
+          <i class="fas fa-envelope"></i> Messages
+          <span class="count-pill" id="pillContacts">0</span>
+        </a>
+        <a data-tab="volunteers" onclick="switchTab('volunteers')">
+          <i class="fas fa-hands-helping"></i> Volunteers
+          <span class="count-pill" id="pillVolunteers">0</span>
+        </a>
+      </nav>
+
+      <div class="side-bottom">
+        <a href="/" target="_blank"><i class="fas fa-external-link-alt"></i> View Website</a>
+        <a href="#" onclick="refreshData(); return false;"><i class="fas fa-sync-alt"></i> Refresh Data</a>
+        <a href="#" class="danger" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main-area">
+
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn-icon mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div>
+            <h1 class="page-title" id="pageTitle">Donations</h1>
+            <p class="page-sub"><span class="live-dot"></span><span id="pageSub">Loading…</span></p>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn-icon" onclick="refreshData()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="st-icon"><i class="fas fa-coins"></i></div>
+          <div class="st-num" id="statTotalPaid">R 0</div>
+          <div class="st-label">Total Raised</div>
+        </div>
+        <div class="stat-card alt">
+          <div class="st-icon"><i class="fas fa-hourglass-half"></i></div>
+          <div class="st-num" id="statPending">R 0</div>
+          <div class="st-label">Pending Donations</div>
+        </div>
+        <div class="stat-card">
+          <div class="st-icon"><i class="fas fa-envelope-open-text"></i></div>
+          <div class="st-num" id="statContacts">0</div>
+          <div class="st-label">Contact Messages</div>
+        </div>
+        <div class="stat-card alt">
+          <div class="st-icon"><i class="fas fa-user-friends"></i></div>
+          <div class="st-num" id="statVolunteers">0</div>
+          <div class="st-label">Volunteers</div>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="content-area">
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by name, email, or keyword…" oninput="applyFilters()" />
+          </div>
+          <div class="filter-group" id="filterGroup"></div>
+          <button class="btn-export" onclick="exportCSV()">
+            <i class="fas fa-download"></i> Export CSV
+          </button>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-card">
+          <div class="table-wrap" id="tableWrap">
+            <!-- table injected by JS -->
+          </div>
+          <div class="pagination-bar" id="paginationBar"></div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL                                                         -->
+  <!-- ============================================================ -->
+  <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="modalTitle">Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOASTS -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ============================================================
+    // STATE
+    // ============================================================
+    const API_BASE = window.location.origin + '/api';
+    let adminKey = sessionStorage.getItem('baobab_admin_key') || '';
+    let currentTab = 'donations';
+    let donations = [];
+    let contacts = [];
+    let volunteers = [];
+    let currentPage = 1;
+    const PAGE_SIZE = 10;
+    let searchTerm = '';
+    let activeFilter = 'all';
+    const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+
+    // ============================================================
+    // LOGIN
+    // ============================================================
+    async function login() {
+      const key = document.getElementById('adminKey').value.trim();
+      if (!key) return;
+      adminKey = key;
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in…';
+      document.getElementById('loginError').textContent = '';
+
+      try {
+        await loadAllData();
+        sessionStorage.setItem('baobab_admin_key', key);
+        showApp();
+      } catch (err) {
+        document.getElementById('loginError').textContent = err.message || 'Login failed';
+        adminKey = '';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-lock"></i> Sign In';
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('baobab_admin_key');
+      adminKey = '';
+      document.getElementById('appShell').classList.remove('active');
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('adminKey').value = '';
+      document.getElementById('loginBtn').disabled = false;
+      document.getElementById('loginBtn').innerHTML = '<i class="fas fa-lock"></i> Sign In';
+    }
+
+    function showApp() {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('appShell').classList.add('active');
+      switchTab('donations');
+    }
+
+    // ============================================================
+    // API
+    // ============================================================
+    async function apiFetch(path) {
+      const res = await fetch(API_BASE + path, { headers: { 'x-admin-key': adminKey } });
+      if (res.status === 401) throw new Error('Wrong admin key. Please try again.');
+      if (!res.ok) throw new Error('Request failed (' + res.status + ')');
+      return res.json();
+    }
+
+    async function loadAllData() {
+      const [d, c, v] = await Promise.all([
+        apiFetch('/admin/donations'),
+        apiFetch('/admin/contacts'),
+        apiFetch('/admin/volunteers')
+      ]);
+      donations = d.data || [];
+      contacts = c.data || [];
+      volunteers = v.data || [];
+
+      document.getElementById('statTotalPaid').textContent = 'R ' + (d.totalPaid || 0).toLocaleString('en-ZA');
+      document.getElementById('statPending').textContent = 'R ' + (d.totalPending || 0).toLocaleString('en-ZA');
+      document.getElementById('statContacts').textContent = contacts.length;
+      document.getElementById('statVolunteers').textContent = volunteers.length;
+      document.getElementById('pillDonations').textContent = donations.length;
+      document.getElementById('pillContacts').textContent = contacts.length;
+      document.getElementById('pillVolunteers').textContent = volunteers.length;
+    }
+
+    async function refreshData() {
+      try {
+        await loadAllData();
+        renderTable();
+        toast('Data refreshed', 'success');
+      } catch (err) {
+        toast('Could not refresh: ' + err.message, 'error');
+      }
+    }
+
+    // ============================================================
+    // TABS
+    // ============================================================
+    function switchTab(tab) {
+      currentTab = tab;
+      currentPage = 1;
+      searchTerm = '';
+      activeFilter = 'all';
+      document.getElementById('searchInput').value = '';
+
+      document.querySelectorAll('.side-nav a').forEach(a => {
+        a.classList.toggle('active', a.dataset.tab === tab);
+      });
+
+      const titles = {
+        donations: ['Donations', 'View and manage incoming donations'],
+        contacts: ['Messages', 'Contact form submissions'],
+        volunteers: ['Volunteers', 'People who want to help']
+      };
+      document.getElementById('pageTitle').textContent = titles[tab][0];
+      document.getElementById('pageSub').textContent = titles[tab][1];
+
+      buildFilters();
+      renderTable();
+    }
+
+    // ============================================================
+    // FILTERS
+    // ============================================================
+    function buildFilters() {
+      const group = document.getElementById('filterGroup');
+      if (currentTab === 'donations') {
+        const statuses = ['all', 'pending', 'paid', 'cancelled', 'failed'];
+        group.innerHTML = statuses.map(s => `
+          <button class="filter-chip ${s === 'all' ? 'active' : ''}" data-filter="${s}" onclick="setFilter('${s}')">
+            ${s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
+          </button>
+        `).join('');
+      } else if (currentTab === 'volunteers') {
+        const avail = ['all', 'Weekdays', 'Weekends', 'Evenings', 'Flexible'];
+        group.innerHTML = avail.map(s => `
+          <button class="filter-chip ${s === 'all' ? 'active' : ''}" data-filter="${s}" onclick="setFilter('${s}')">
+            ${s === 'all' ? 'All' : s}
+          </button>
+        `).join('');
+      } else {
+        group.innerHTML = '';
+      }
+    }
+
+    function setFilter(f) {
+      activeFilter = f;
+      currentPage = 1;
+      document.querySelectorAll('.filter-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.filter === f);
+      });
+      renderTable();
+    }
+
+    function applyFilters() {
+      searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      currentPage = 1;
+      renderTable();
+    }
+
+    // ============================================================
+    // DATA ACCESS
+    // ============================================================
+    function getFilteredData() {
+      let data = currentTab === 'donations' ? donations
+                : currentTab === 'contacts' ? contacts
+                : volunteers;
+
+      if (activeFilter !== 'all') {
+        if (currentTab === 'donations') {
+          data = data.filter(d => d.status === activeFilter);
+        } else if (currentTab === 'volunteers') {
+          data = data.filter(v => (v.availability || '').toLowerCase() === activeFilter.toLowerCase());
+        }
+      }
+
+      if (searchTerm) {
+        data = data.filter(item => {
+          const hay = JSON.stringify(item).toLowerCase();
+          return hay.includes(searchTerm);
+        });
+      }
+
+      return data;
+    }
+
+    // ============================================================
+    // RENDER TABLE
+    // ============================================================
+    function renderTable() {
+      const wrap = document.getElementById('tableWrap');
+      const data = getFilteredData();
+      const totalPages = Math.max(1, Math.ceil(data.length / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageData = data.slice(start, start + PAGE_SIZE);
+
+      if (!data.length) {
+        wrap.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h4>Nothing here yet</h4>
+            <p>${searchTerm || activeFilter !== 'all' ? 'No results match your search or filter.' : 'New ' + currentTab + ' will appear here automatically.'}</p>
+          </div>`;
+        renderPagination(0, 0);
+        return;
+      }
+
+      if (currentTab === 'donations') renderDonations(pageData);
+      else if (currentTab === 'contacts') renderContacts(pageData);
+      else renderVolunteers(pageData);
+
+      renderPagination(data.length, totalPages);
+    }
+
+    function renderDonations(rows) {
+      document.getElementById('tableWrap').innerHTML = `
+        <table>
+          <thead><tr>
+            <th>Reference</th><th>Donor</th><th>Email</th><th>Amount</th>
+            <th>Status</th><th>Date</th><th></th>
+          </tr></thead>
+          <tbody>
+            ${rows.map(d => `
+              <tr onclick="openDonationModal('${d._id}')">
+                <td><code>${d.reference || '—'}</code></td>
+                <td><span class="cell-name">${esc(d.firstName)} ${esc(d.lastName)}</span></td>
+                <td><span class="cell-email">${esc(d.email)}</span></td>
+                <td><span class="cell-amount">R ${Number(d.amount).toFixed(2)}</span></td>
+                <td><span class="badge-status badge-${d.status}">${d.status}</span></td>
+                <td><span class="cell-date">${fmtDate(d.createdAt)}</span></td>
+                <td>
+                  <button class="btn-row-action" onclick="event.stopPropagation(); openDonationModal('${d._id}')" title="View">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    function renderContacts(rows) {
+      document.getElementById('tableWrap').innerHTML = `
+        <table>
+          <thead><tr>
+            <th>Name</th><th>Email</th><th>Phone</th><th>Subject</th>
+            <th>Message</th><th>Date</th><th></th>
+          </tr></thead>
+          <tbody>
+            ${rows.map(c => `
+              <tr onclick="openContactModal('${c._id}')">
+                <td><span class="cell-name">${esc(c.name)}</span></td>
+                <td><span class="cell-email">${esc(c.email)}</span></td>
+                <td>${esc(c.phone) || '—'}</td>
+                <td>${esc(c.subject)}</td>
+                <td><span class="cell-msg">${esc(c.message)}</span></td>
+                <td><span class="cell-date">${fmtDate(c.createdAt)}</span></td>
+                <td>
+                  <button class="btn-row-action" onclick="event.stopPropagation(); openContactModal('${c._id}')" title="View">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    function renderVolunteers(rows) {
+      document.getElementById('tableWrap').innerHTML = `
+        <table>
+          <thead><tr>
+            <th>Name</th><th>Email</th><th>Phone</th><th>Location</th>
+            <th>Skills</th><th>Availability</th><th>Date</th><th></th>
+          </tr></thead>
+          <tbody>
+            ${rows.map(v => `
+              <tr onclick="openVolunteerModal('${v._id}')">
+                <td><span class="cell-name">${esc(v.firstName)} ${esc(v.lastName)}</span></td>
+                <td><span class="cell-email">${esc(v.email)}</span></td>
+                <td>${esc(v.phone) || '—'}</td>
+                <td>${esc(v.location) || '—'}</td>
+                <td><span class="cell-msg">${esc(v.skills) || '—'}</span></td>
+                <td>${v.availability ? `<span class="badge-status badge-paid" style="background:rgba(199,107,43,0.12);color:#a65f2a;">${esc(v.availability)}</span>` : '—'}</td>
+                <td><span class="cell-date">${fmtDate(v.createdAt)}</span></td>
+                <td>
+                  <button class="btn-row-action" onclick="event.stopPropagation(); openVolunteerModal('${v._id}')" title="View">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    function renderPagination(total, totalPages) {
+      const bar = document.getElementById('paginationBar');
+      if (!total) { bar.innerHTML = ''; return; }
+      const start = (currentPage - 1) * PAGE_SIZE + 1;
+      const end = Math.min(currentPage * PAGE_SIZE, total);
+
+      const buttons = [];
+      for (let i = 1; i <= totalPages; i++) {
+        buttons.push(`<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`);
+      }
+      bar.innerHTML = `
+        <span>Showing ${start}–${end} of ${total}</span>
+        <div class="pager">
+          <button ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></button>
+          ${buttons.join('')}
+          <button ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></button>
+        </div>`;
+    }
+
+    function goToPage(p) {
+      currentPage = p;
+      renderTable();
+      document.getElementById('tableWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ============================================================
+    // MODALS
+    // ============================================================
+    function openDonationModal(id) {
+      const d = donations.find(x => x._id === id);
+      if (!d) return;
+      document.getElementById('modalTitle').textContent = 'Donation details';
+      document.getElementById('modalBody').innerHTML = `
+        ${row('Reference', `<code>${esc(d.reference)}</code>`)}
+        ${row('Donor', `<span class="cell-name">${esc(d.firstName)} ${esc(d.lastName)}</span>`)}
+        ${row('Email', `<a href="mailto:${esc(d.email)}">${esc(d.email)}</a>`)}
+        ${row('Phone', esc(d.phone) || '—')}
+        ${row('Amount', `<span class="cell-amount" style="font-size:1.2rem;">R ${Number(d.amount).toFixed(2)}</span>`)}
+        ${row('Status', `<span class="badge-status badge-${d.status}">${d.status}</span>`)}
+        ${row('Date', fmtDate(d.createdAt, true))}
+        ${d.message ? row('Message', esc(d.message)) : ''}
+        <div style="margin-top:1.4rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
+          ${d.status !== 'paid' ? `<button class="btn-baobab" style="width:auto; height:44px; padding:0 1.6rem; font-size:0.85rem;" onclick="setDonationStatus('${d._id}', 'paid')"><i class="fas fa-check"></i> Mark as Paid</button>` : ''}
+          ${d.status !== 'cancelled' ? `<button class="btn-baobab" style="width:auto; height:44px; padding:0 1.6rem; font-size:0.85rem; background:var(--muted);" onclick="setDonationStatus('${d._id}', 'cancelled')"><i class="fas fa-times"></i> Mark as Cancelled</button>` : ''}
+        </div>`;
+      detailModal.show();
+    }
+
+    function openContactModal(id) {
+      const c = contacts.find(x => x._id === id);
+      if (!c) return;
+      document.getElementById('modalTitle').textContent = 'Message details';
+      document.getElementById('modalBody').innerHTML = `
+        ${row('From', `<span class="cell-name">${esc(c.name)}</span>`)}
+        ${row('Email', `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`)}
+        ${row('Phone', esc(c.phone) || '—')}
+        ${row('Subject', esc(c.subject))}
+        ${row('Received', fmtDate(c.createdAt, true))}
+        ${row('Message', `<div style="background:var(--cream-card); padding:1rem; border-radius:12px; line-height:1.7;">${esc(c.message)}</div>`)}
+        <div style="margin-top:1.4rem;">
+          <a class="btn-baobab" style="width:auto; height:44px; padding:0 1.6rem; font-size:0.85rem; text-decoration:none;" href="mailto:${esc(c.email)}?subject=Re: ${encodeURIComponent(c.subject || '')}">
+            <i class="fas fa-reply"></i> Reply by Email
+          </a>
+        </div>`;
+      detailModal.show();
+    }
+
+    function openVolunteerModal(id) {
+      const v = volunteers.find(x => x._id === id);
+      if (!v) return;
+      document.getElementById('modalTitle').textContent = 'Volunteer details';
+      document.getElementById('modalBody').innerHTML = `
+        ${row('Name', `<span class="cell-name">${esc(v.firstName)} ${esc(v.lastName)}</span>`)}
+        ${row('Email', `<a href="mailto:${esc(v.email)}">${esc(v.email)}</a>`)}
+        ${row('Phone', esc(v.phone) || '—')}
+        ${row('Age', esc(v.age) || '—')}
+        ${row('Location', esc(v.location) || '—')}
+        ${row('Skills', esc(v.skills) || '—')}
+        ${row('Availability', esc(v.availability) || '—')}
+        ${row('Signed up', fmtDate(v.createdAt, true))}
+        ${v.message ? row('Message', `<div style="background:var(--cream-card); padding:1rem; border-radius:12px; line-height:1.7;">${esc(v.message)}</div>`) : ''}`;
+      detailModal.show();
+    }
+
+    function row(label, value) {
+      return `<div class="detail-row"><div class="dt">${label}</div><div class="dd">${value}</div></div>`;
+    }
+
+    async function setDonationStatus(id, status) {
+      try {
+        const res = await fetch(`${API_BASE}/admin/donations/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+          body: JSON.stringify({ status })
+        });
+        if (!res.ok) throw new Error('Could not update status');
+        detailModal.hide();
+        toast('Donation marked as ' + status, 'success');
+        await refreshData();
+      } catch (err) {
+        toast('Update failed: ' + err.message, 'error');
+      }
+    }
+
+    // ============================================================
+    // CSV EXPORT
+    // ============================================================
+    function exportCSV() {
+      const data = getFilteredData();
+      if (!data.length) { toast('Nothing to export', 'error'); return; }
+
+      let headers, rows;
+      if (currentTab === 'donations') {
+        headers = ['Reference', 'First Name', 'Last Name', 'Email', 'Phone', 'Amount', 'Status', 'Date'];
+        rows = data.map(d => [d.reference, d.firstName, d.lastName, d.email, d.phone, d.amount, d.status, fmtDate(d.createdAt, true)]);
+      } else if (currentTab === 'contacts') {
+        headers = ['Name', 'Email', 'Phone', 'Subject', 'Message', 'Date'];
+        rows = data.map(c => [c.name, c.email, c.phone, c.subject, c.message, fmtDate(c.createdAt, true)]);
+      } else {
+        headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Age', 'Location', 'Skills', 'Availability', 'Date'];
+        rows = data.map(v => [v.firstName, v.lastName, v.email, v.phone, v.age, v.location, v.skills, v.availability, fmtDate(v.createdAt, true)]);
+      }
+
+      const csv = [headers, ...rows].map(r => r.map(cell => {
+        const s = String(cell == null ? '' : cell);
+        return '"' + s.replace(/"/g, '""') + '"';
+      }).join(',')).join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `baobab-${currentTab}-${new Date().toISOString().slice(0,10)}.csv`;
+      link.click();
+      toast('Exported ' + data.length + ' rows', 'success');
+    }
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    function esc(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function fmtDate(iso, withTime) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (isNaN(d)) return '—';
+      const date = d.toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric' });
+      if (!withTime) return date;
+      const time = d.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+      return date + ' · ' + time;
+    }
+
+    function toast(msg, type) {
+      const el = document.createElement('div');
+      el.className = 'baobab-toast ' + (type || '');
+      el.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i><span>${esc(msg)}</span>`;
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => el.remove(), 300); }, 3000);
+    }
+
+    // ============================================================
+    // BOOT
+    // ============================================================
+    document.getElementById('adminKey').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+
+    if (adminKey) {
+      loadAllData()
+        .then(showApp)
+        .catch(() => { adminKey = ''; sessionStorage.removeItem('baobab_admin_key'); });
+    }
+  </script>
+</body>
+</html>
