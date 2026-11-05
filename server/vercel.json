@@ -1,4 +1,3 @@
-
 {
   "version": 2,
   "builds": [
@@ -8,9 +7,16 @@
     }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "server.js"
-    }
+    { "src": "/api/health", "dest": "server.js" },
+    { "src": "/api/contact", "dest": "server.js" },
+    { "src": "/api/contact/(.*)", "dest": "server.js" },
+    { "src": "/api/donation", "dest": "server.js" },
+    { "src": "/api/donation/(.*)", "dest": "server.js" },
+    { "src": "/api/volunteer", "dest": "server.js" },
+    { "src": "/api/volunteer/(.*)", "dest": "server.js" },
+    { "src": "/api/admin", "dest": "server.js" },
+    { "src": "/api/admin/(.*)", "dest": "server.js" },
+    { "src": "/admin.html", "dest": "server.js" },
+    { "src": "/(.*)", "dest": "server.js" }
   ]
 }
