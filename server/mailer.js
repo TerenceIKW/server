@@ -1,27 +1,15 @@
-const nodemailer = require('nodemailer');
-const path = require('path');
+const { Resend } = require('resend');
 
-const logoPath = path.join(__dirname, '..', 'assets', 'img', 'logo,.png');
+let resendClient;
 
-let transporter;
+function getResendClient() {
+  if (resendClient) return resendClient;
 
-function getTransporter() {
-  if (transporter) return transporter;
+  const apiKey = process.env.RESEND_API_KEY || process.env.resend_api;
+  if (!apiKey) return null;
 
-  const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS } = process.env;
-  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) return null;
-
-  transporter = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: Number(SMTP_PORT),
-    secure: String(SMTP_SECURE).toLowerCase() === 'true',
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS
-    }
-  });
-
-  return transporter;
+  resendClient = new Resend(apiKey);
+  return resendClient;
 }
 
 function escapeHtml(value) {
@@ -64,10 +52,10 @@ async function sendSubmissionNotification(type, data) {
     .split(',')
     .map(email => email.trim())
     .filter(Boolean);
-  const mailTransporter = getTransporter();
+  const client = getResendClient();
 
-  if (!recipients.length || !mailTransporter) {
-    console.warn('Email notifications are disabled. Configure SMTP_* and NOTIFICATION_EMAIL in .env.');
+  if (!recipients.length || !client || !process.env.MAIL_FROM) {
+    console.warn('Email notifications are disabled. Configure RESEND_API_KEY, MAIL_FROM, and NOTIFICATION_EMAIL in .env.');
     return false;
   }
 
@@ -102,7 +90,7 @@ async function sendSubmissionNotification(type, data) {
                 <tr><td style="height:5px;background:#e2a84a;font-size:0;line-height:0;">&nbsp;</td></tr>
                 <tr>
                   <td align="center" style="padding:18px 24px;background:#ffffff;">
-                    <img src="cid:baobab-logo" width="170" alt="Baobab Networking Centre" style="display:block;width:170px;max-width:100%;height:auto;margin:0 auto;border:0;">
+                    <div style="color:#245b46;font-size:20px;font-weight:bold;">Baobab Networking Centre</div>
                   </td>
                 </tr>
                 <tr>
@@ -144,21 +132,18 @@ async function sendSubmissionNotification(type, data) {
       </body>
     </html>`;
 
-  await mailTransporter.sendMail({
-    from: process.env.MAIL_FROM || process.env.SMTP_USER,
+  const { error } = await client.emails.send({
+    from: process.env.MAIL_FROM,
     to: recipients,
-    replyTo: data.Email || process.env.SMTP_USER,
+    replyTo: data.Email || process.env.MAIL_FROM,
     subject,
     text,
-    html,
-    attachments: [
-      {
-        filename: 'baobab-logo.png',
-        path: logoPath,
-        cid: 'baobab-logo'
-      }
-    ]
+    html
   });
+
+  if (error) {
+    throw new Error(error.message);
+  }
 
   console.log(`Email notification sent for ${type}.`);
   return true;
