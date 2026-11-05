@@ -23,6 +23,12 @@ function getAllowedOrigins() {
   return [...new Set([...DEFAULT_ORIGINS, ...fromEnv])];
 }
 
+// Mount each router under /api/... and bare /... (Vercel sometimes strips /api)
+function mountApi(basePath, router) {
+  app.use(`/api${basePath}`, router);
+  app.use(basePath, router);
+}
+
 // ============================================================
 // MIDDLEWARE
 // ============================================================
@@ -31,7 +37,6 @@ app.use(cors({
   origin(origin, callback) {
     const allowed = getAllowedOrigins();
 
-    // Non-browser / same-origin tools (curl, server-to-server) send no Origin
     if (!origin || allowed.includes(origin)) {
       return callback(null, true);
     }
@@ -46,7 +51,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Ensure Mongo is ready on every cold start (Vercel serverless)
 app.use(async (req, res, next) => {
   try {
     await connectDB();
@@ -58,30 +62,51 @@ app.use(async (req, res, next) => {
 });
 
 // ============================================================
-// SERVE STATIC FILES (admin dashboard only — WHM hosts the public site)
+// STATIC + ROOT
 // ============================================================
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Baobab API',
+    health: '/api/health',
+    endpoints: [
+      'POST /api/contact',
+      'POST /api/donation',
+      'POST /api/volunteer',
+      'GET /api/admin/*'
+    ]
+  });
+});
 
 // ============================================================
 // API ROUTES
 // ============================================================
-app.use('/api/contact', require('./routes/contact'));
-app.use('/api/donation', require('./routes/donation'));
-app.use('/api/volunteer', require('./routes/volunteer'));
-app.use('/api/admin', require('./routes/admin'));
+mountApi('/contact', require('./routes/contact'));
+mountApi('/donation', require('./routes/donation'));
+mountApi('/volunteer', require('./routes/volunteer'));
+mountApi('/admin', require('./routes/admin'));
 
-// Health check
-app.get('/api/health', (req, res) => {
+function healthHandler(req, res) {
   res.json({
     success: true,
     message: 'Baobab backend is running',
     timestamp: new Date().toISOString()
   });
-});
+}
 
-// 404 — only for API routes that don't match
+app.get('/api/health', healthHandler);
+app.get('/health', healthHandler);
+
+// 404
 app.use((req, res) => {
-  res.status(404).json({ success: false, message: 'Route not found' });
+  res.status(404).json({
+    success: false,
+    message: 'Route not found',
+    method: req.method,
+    path: req.path
+  });
 });
 
 // Error handler
@@ -95,7 +120,7 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================================
-// START (local only — Vercel uses the exported app)
+// START (local only — Vercel uses api/index.js)
 // ============================================================
 async function start() {
   try {

@@ -1,22 +1,14 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "server.js",
-      "use": "@vercel/node"
+      "source": "/(.*)",
+      "destination": "/api"
     }
   ],
-  "routes": [
-    { "src": "/api/health", "dest": "server.js" },
-    { "src": "/api/contact", "dest": "server.js" },
-    { "src": "/api/contact/(.*)", "dest": "server.js" },
-    { "src": "/api/donation", "dest": "server.js" },
-    { "src": "/api/donation/(.*)", "dest": "server.js" },
-    { "src": "/api/volunteer", "dest": "server.js" },
-    { "src": "/api/volunteer/(.*)", "dest": "server.js" },
-    { "src": "/api/admin", "dest": "server.js" },
-    { "src": "/api/admin/(.*)", "dest": "server.js" },
-    { "src": "/admin.html", "dest": "server.js" },
-    { "src": "/(.*)", "dest": "server.js" }
-  ]
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "public/**"
+    }
+  }
 }
